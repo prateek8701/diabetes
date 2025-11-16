@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Register - Diabetes Predictor</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+ <div class="login">
+    <h1>Create Your Account</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <form action="{{ url_for('register') }}" method="post">
+        <input type="text" name="username" placeholder="Username" required="required" />
+        <input type="email" name="email" placeholder="Email" required="required" />
+        <input type="password" name="password" placeholder="Password" required="required" />
+        <button type="submit" class="btn btn-primary btn-block btn-large">Register</button>
+    </form>
+    
+    <p style="margin-top: 20px; color: #ddd;">
+        Already have an account? <a href="{{ url_for('login') }}" style="color: #6eb6de;">Login here</a>
+    </p>
+    <p>
+        <a href="{{ url_for('home') }}" style="color: #6eb6de;">Back to Home</a>
+    </p>
+ </div>
+</body>
+</html>

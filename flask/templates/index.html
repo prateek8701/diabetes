@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Diabetes Predictor & Diet Planner</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+ <div class="login">
+        <div class="nav-buttons">
+            {% if current_user.is_authenticated %}
+                <span style="color: #ddd;">Hello, {{ current_user.username }}</span>
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('register') }}">Register</a>
+            {% endif %}
+        </div>
+        
+        <h1>Diabetes Predictor & Health Planner</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+     
+    <form action="{{ url_for('predict')}}"method="post">
+        <input type="text" name="Glucose Level" placeholder="Glucose Level (mg/dL)" required="required" />
+        <input type="text" name="Insulin" placeholder="Insulin (μU/mL)" required="required" />
+        <input type="text" name="BMI" placeholder="BMI (e.g., 25.5)" required="required" />
+        <input type="text" name="Age" placeholder="Age (years)" required="required" />
+        <input type="text" name="Blood Pressure Systolic" placeholder="Blood Pressure - Top Number (e.g., 120)" required="required" />
+        <input type="text" name="Blood Pressure Diastolic" placeholder="Blood Pressure - Bottom Number (e.g., 80)" required="required" />
+        
+        <div class="checkbox-container">
+            <label class="checkbox-label">
+                <input type="checkbox" name="Family History" value="yes" />
+                <span>I have a family history of diabetes</span>
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-large">Get Complete Health Analysis</button>
+    </form>
+
+   <br>
+   <br>
+   
+   {% if prediction_text %}
+   <div class="prediction-result">
+       <h2>{{ prediction_text }}</h2>
+   </div>
+   
+   <div class="visualizations">
+       <h2>Health Metrics Visualization</h2>
+       
+       <div class="chart-grid">
+           <div class="chart-container">
+               <h3>BMI Status</h3>
+               <canvas id="bmiChart"></canvas>
+           </div>
+           
+           <div class="chart-container">
+               <h3>Glucose Level</h3>
+               <canvas id="glucoseChart"></canvas>
+           </div>
+           
+           <div class="chart-container">
+               <h3>Diabetes Risk</h3>
+               <canvas id="riskChart"></canvas>
+           </div>
+           
+           <div class="chart-container">
+               <h3>Nutrition Breakdown</h3>
+               <canvas id="nutritionChart"></canvas>
+           </div>
+       </div>
+   </div>
+   {% endif %}
+
+   {% if diet_plan %}
+   <div class="diet-plan">
+       <h2>Your Personalized Diet Plan</h2>
+       
+       <div class="plan-section">
+           <h3>Your Health Metrics</h3>
+           <ul>
+               <li>Glucose Level: {{ diet_plan.health_metrics.glucose }}</li>
+               <li>Insulin Level: {{ diet_plan.health_metrics.insulin }}</li>
+               <li>BMI: {{ diet_plan.health_metrics.bmi }}</li>
+               <li>Age: {{ diet_plan.health_metrics.age }} years</li>
+           </ul>
+       </div>
+       
+       <div class="plan-section">
+           <h3>Daily Calorie Target: {{ diet_plan.daily_calories }} calories</h3>
+       </div>
+       
+       <div class="plan-section">
+           <h3>Macronutrient Breakdown</h3>
+           <ul>
+               <li>Carbohydrates: {{ diet_plan.macronutrients.carbohydrates }}</li>
+               <li>Protein: {{ diet_plan.macronutrients.protein }}</li>
+               <li>Healthy Fats: {{ diet_plan.macronutrients.healthy_fats }}</li>
+               <li>Fiber: {{ diet_plan.macronutrients.fiber }}</li>
+           </ul>
+           <p><em>{{ diet_plan.macronutrients.details }}</em></p>
+       </div>
+       
+       <div class="plan-section">
+           <h3>Daily Meal Suggestions</h3>
+           
+           <div class="meal-section">
+               <h4>Breakfast ({{ diet_plan.meal_suggestions.breakfast.calories }} cal)</h4>
+               <ul>
+               {% for option in diet_plan.meal_suggestions.breakfast.options %}
+                   <li>{{ option }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+           
+           <div class="meal-section">
+               <h4>Lunch ({{ diet_plan.meal_suggestions.lunch.calories }} cal)</h4>
+               <ul>
+               {% for option in diet_plan.meal_suggestions.lunch.options %}
+                   <li>{{ option }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+           
+           <div class="meal-section">
+               <h4>Dinner ({{ diet_plan.meal_suggestions.dinner.calories }} cal)</h4>
+               <ul>
+               {% for option in diet_plan.meal_suggestions.dinner.options %}
+                   <li>{{ option }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+           
+           <div class="meal-section">
+               <h4>Snacks ({{ diet_plan.meal_suggestions.snacks.calories }} cal)</h4>
+               <ul>
+               {% for option in diet_plan.meal_suggestions.snacks.options %}
+                   <li>{{ option }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+       </div>
+       
+       <div class="plan-section">
+           <h3>Diabetic-Friendly Foods</h3>
+           
+           <div class="food-category">
+               <h4>Vegetables</h4>
+               <ul>
+               {% for food in diet_plan.diabetic_friendly_foods.vegetables %}
+                   <li>{{ food }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+           
+           <div class="food-category">
+               <h4>Proteins</h4>
+               <ul>
+               {% for food in diet_plan.diabetic_friendly_foods.proteins %}
+                   <li>{{ food }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+           
+           <div class="food-category">
+               <h4>Whole Grains</h4>
+               <ul>
+               {% for food in diet_plan.diabetic_friendly_foods.grains %}
+                   <li>{{ food }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+           
+           <div class="food-category">
+               <h4>Fruits</h4>
+               <ul>
+               {% for food in diet_plan.diabetic_friendly_foods.fruits %}
+                   <li>{{ food }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+           
+           <div class="food-category">
+               <h4>Dairy</h4>
+               <ul>
+               {% for food in diet_plan.diabetic_friendly_foods.dairy %}
+                   <li>{{ food }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+           
+           <div class="food-category">
+               <h4>Healthy Fats</h4>
+               <ul>
+               {% for food in diet_plan.diabetic_friendly_foods.healthy_fats %}
+                   <li>{{ food }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+       </div>
+       
+       <div class="plan-section avoid-section">
+           <h3>Foods to Avoid</h3>
+           
+           <div class="food-category">
+               <h4>High Sugar Foods</h4>
+               <ul>
+               {% for food in diet_plan.foods_to_avoid.high_sugar %}
+                   <li>{{ food }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+           
+           <div class="food-category">
+               <h4>Refined Carbohydrates</h4>
+               <ul>
+               {% for food in diet_plan.foods_to_avoid.refined_carbs %}
+                   <li>{{ food }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+           
+           <div class="food-category">
+               <h4>Unhealthy Fats</h4>
+               <ul>
+               {% for food in diet_plan.foods_to_avoid.unhealthy_fats %}
+                   <li>{{ food }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+           
+           <div class="food-category">
+               <h4>High Sodium Foods</h4>
+               <ul>
+               {% for food in diet_plan.foods_to_avoid.high_sodium %}
+                   <li>{{ food }}</li>
+               {% endfor %}
+               </ul>
+           </div>
+       </div>
+       
+       <div class="plan-section">
+           <h3>7-Day Diet Schedule</h3>
+           
+           {% for day, meals in diet_plan.weekly_schedule.items() %}
+           <div class="day-schedule">
+               <h4>{{ day }}</h4>
+               <ul>
+                   <li><strong>Breakfast:</strong> {{ meals.breakfast }}</li>
+                   <li><strong>Lunch:</strong> {{ meals.lunch }}</li>
+                   <li><strong>Dinner:</strong> {{ meals.dinner }}</li>
+                   <li><strong>Snack:</strong> {{ meals.snack }}</li>
+               </ul>
+           </div>
+           {% endfor %}
+       </div>
+       
+       <div class="plan-section tips-section">
+           <h3>Important Tips</h3>
+           <ul>
+           {% for tip in diet_plan.tips %}
+               <li>{{ tip }}</li>
+           {% endfor %}
+           </ul>
+       </div>
+   </div>
+   {% endif %}
+
+   {% if checkup_plan %}
+   <div class="checkup-plan">
+       <h2>Health Checkup Recommendations</h2>
+       
+       <div class="plan-section">
+           <h3>Blood Pressure Status</h3>
+           <p>Your Blood Pressure: <strong class="bp-status-{{ checkup_plan.blood_pressure_info.status }}">{{ checkup_plan.blood_pressure_info.reading }}</strong></p>
+           <p>Category: <strong class="bp-status-{{ checkup_plan.blood_pressure_info.status }}">{{ checkup_plan.blood_pressure_info.category }}</strong></p>
+           {% if checkup_plan.family_history %}
+           <p><strong>⚠️ Family History:</strong> You have indicated a family history of diabetes. This increases your risk and requires more frequent monitoring.</p>
+           {% endif %}
+       </div>
+       
+       <div class="plan-section">
+           <h3>Doctor Visit Frequency</h3>
+           <p><strong>{{ checkup_plan.checkup_frequency.doctor_visits }}</strong></p>
+           <p><em>{{ checkup_plan.checkup_frequency.reason }}</em></p>
+       </div>
+       
+       <div class="plan-section">
+           <h3>Recommended Blood Tests</h3>
+           
+           {% if checkup_plan.blood_tests.essential %}
+           <div class="test-category">
+               <h4>🔴 Essential Tests (High Priority)</h4>
+               {% for test in checkup_plan.blood_tests.essential %}
+               <div class="test-item">
+                   <h5>{{ test.name }}</h5>
+                   <p>{{ test.reason }}</p>
+                   <p class="frequency">Frequency: {{ test.frequency }}</p>
+               </div>
+               {% endfor %}
+           </div>
+           {% endif %}
+           
+           {% if checkup_plan.blood_tests.recommended %}
+           <div class="test-category">
+               <h4>🟡 Recommended Tests</h4>
+               {% for test in checkup_plan.blood_tests.recommended %}
+               <div class="test-item">
+                   <h5>{{ test.name }}</h5>
+                   <p>{{ test.reason }}</p>
+                   <p class="frequency">Frequency: {{ test.frequency }}</p>
+               </div>
+               {% endfor %}
+           </div>
+           {% endif %}
+           
+           {% if checkup_plan.blood_tests.optional %}
+           <div class="test-category">
+               <h4>🟢 Optional Tests</h4>
+               {% for test in checkup_plan.blood_tests.optional %}
+               <div class="test-item">
+                   <h5>{{ test.name }}</h5>
+                   <p>{{ test.reason }}</p>
+                   <p class="frequency">Frequency: {{ test.frequency }}</p>
+               </div>
+               {% endfor %}
+           </div>
+           {% endif %}
+       </div>
+       
+       <div class="plan-section">
+           <h3>Lifestyle Recommendations</h3>
+           {% for tip in checkup_plan.lifestyle_tips %}
+           <div class="lifestyle-tip">
+               <h5><span class="tip-icon">{{ tip.icon }}</span>{{ tip.category }}</h5>
+               <p><strong>{{ tip.recommendation }}</strong></p>
+               <p>{{ tip.details }}</p>
+           </div>
+           {% endfor %}
+       </div>
+       
+       <div class="plan-section next-steps-section">
+           <h3>Next Steps</h3>
+           <ul>
+           {% for step in checkup_plan.next_steps %}
+               <li>{{ step }}</li>
+           {% endfor %}
+           </ul>
+       </div>
+   </div>
+   {% endif %}
+
+ </div>
+
+<script>
+{% if prediction_text and chart_data %}
+document.addEventListener('DOMContentLoaded', function() {
+    const bmiValue = {{ chart_data.bmi }};
+    const glucoseValue = {{ chart_data.glucose }};
+    const riskValue = {{ chart_data.risk }};
+    const carbsPercent = {{ chart_data.nutrition.carbs }};
+    const proteinPercent = {{ chart_data.nutrition.protein }};
+    const fatsPercent = {{ chart_data.nutrition.fats }};
+    
+    const bmiCtx = document.getElementById('bmiChart').getContext('2d');
+    new Chart(bmiCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Underweight', 'Normal', 'Overweight', 'Obese'],
+            datasets: [{
+                label: 'BMI Category',
+                data: [18.5, 25, 30, 40],
+                backgroundColor: ['#3498db', '#2ecc71', '#f39c12', '#e74c3c'],
+                borderWidth: 0
+            }, {
+                label: 'Your BMI',
+                data: [bmiValue, bmiValue, bmiValue, bmiValue],
+                type: 'line',
+                borderColor: '#9b59b6',
+                borderWidth: 3,
+                pointRadius: 5,
+                pointBackgroundColor: '#9b59b6',
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 45
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true
+                }
+            }
+        }
+    });
+    
+    const glucoseCtx = document.getElementById('glucoseChart').getContext('2d');
+    new Chart(glucoseCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Normal (<100)', 'Pre-Diabetes (100-125)', 'Diabetes (>125)'],
+            datasets: [{
+                data: [100, 25, 100],
+                backgroundColor: ['#2ecc71', '#f39c12', '#e74c3c'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Your Glucose: ' + glucoseValue + ' mg/dL',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
+                }
+            }
+        }
+    });
+    
+    const riskCtx = document.getElementById('riskChart').getContext('2d');
+    new Chart(riskCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+            datasets: [{
+                label: 'Risk Level',
+                data: [riskValue === 0 ? 100 : 20, riskValue === 0 ? 20 : 50, riskValue === 1 ? 100 : 20],
+                backgroundColor: ['#2ecc71', '#f39c12', '#e74c3c'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: riskValue === 1 ? 'High Diabetes Risk Detected' : 'Low Diabetes Risk',
+                    color: riskValue === 1 ? '#e74c3c' : '#2ecc71',
+                    font: {
+                        size: 14,
+                        weight: 'bold'
+                    }
+                }
+            }
+        }
+    });
+    
+    const nutritionCtx = document.getElementById('nutritionChart').getContext('2d');
+    new Chart(nutritionCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Carbohydrates', 'Protein', 'Healthy Fats'],
+            datasets: [{
+                data: [carbsPercent, proteinPercent, fatsPercent],
+                backgroundColor: ['#3498db', '#e74c3c', '#f39c12'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                title: {
+                    display: true,
+                    text: 'Recommended Daily Macronutrients',
+                    font: {
+                        size: 14
+                    }
+                }
+            }
+        }
+    });
+});
+{% endif %}
+</script>
+
+</body>
+</html>

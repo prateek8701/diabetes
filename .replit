@@ -1,0 +1,48 @@
+modules = ["web", "python-3.11"]
+[agent]
+expertMode = true
+integrations = ["python_database:1.0.0"]
+
+[nix]
+channel = "stable-25_05"
+packages = ["glibcLocales"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Flask App"
+
+[[workflows.workflow]]
+name = "Flask App"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd flask && python app.py"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 38471
+externalPort = 3001
+
+[[ports]]
+localPort = 41231
+externalPort = 3000
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["python", "flask/app.py"]

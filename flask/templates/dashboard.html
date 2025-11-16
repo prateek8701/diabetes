@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Diabetes Predictor</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+ <div class="login">
+    <h1>Welcome, {{ current_user.username }}!</h1>
+    
+    <div style="text-align: center; margin: 20px 0;">
+        <a href="{{ url_for('home') }}" class="btn btn-primary">New Health Check</a>
+        <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <div class="gamification-stats">
+        <h2>Your Health Journey</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>{{ gamification.health_points }}</h3>
+                <p>Health Points</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ gamification.current_streak }}</h3>
+                <p>Current Streak</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ gamification.longest_streak }}</h3>
+                <p>Longest Streak</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ gamification.total_checks }}</h3>
+                <p>Total Checks</p>
+            </div>
+        </div>
+        
+        {% if gamification.get_badges() %}
+        <div class="badges-section">
+            <h3>Your Badges</h3>
+            <div class="badges">
+                {% for badge in gamification.get_badges() %}
+                <span class="badge">{{ badge }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="health-history">
+        <h2>Health History</h2>
+        
+        {% if records %}
+        <div class="history-chart">
+            <canvas id="historyChart"></canvas>
+        </div>
+        
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Glucose</th>
+                    <th>BMI</th>
+                    <th>BP</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records[:10] %}
+                <tr>
+                    <td>{{ record.created_at[:10] }}</td>
+                    <td>{{ record.glucose }} mg/dL</td>
+                    <td>{{ record.bmi }}</td>
+                    <td>{{ record.bp_systolic }}/{{ record.bp_diastolic }}</td>
+                    <td class="{% if record.prediction == 1 %}risk-high{% else %}risk-low{% endif %}">
+                        {% if record.prediction == 1 %}Diabetes{% else %}Normal{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color: #ddd; text-align: center; margin: 30px 0;">
+            No health records yet. Take your first health check to get started!
+        </p>
+        {% endif %}
+    </div>
+    
+    <div class="health-assistant">
+        <h2>Health Assistant</h2>
+        <p style="color: #ddd; margin-bottom: 20px;">Ask me anything about diet, exercise, blood sugar, or general health!</p>
+        
+        <div id="chat-messages" class="chat-messages"></div>
+        
+        <div class="chat-input-container">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Type your question here..." />
+            <button onclick="sendMessage()" class="btn btn-primary">Send</button>
+        </div>
+    </div>
+ </div>
+
+<script>
+{% if records %}
+const records = {{ records | tojson }};
+const ctx = document.getElementById('historyChart').getContext('2d');
+
+const dates = records.reverse().slice(0, 10).map(r => new Date(r.created_at).toLocaleDateString());
+const glucoseData = records.slice(0, 10).map(r => r.glucose);
+const bmiData = records.slice(0, 10).map(r => r.bmi);
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: dates,
+        datasets: [{
+            label: 'Glucose (mg/dL)',
+            data: glucoseData,
+            borderColor: '#e74c3c',
+            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+            yAxisID: 'y',
+        }, {
+            label: 'BMI',
+            data: bmiData,
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+            yAxisID: 'y1',
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        scales: {
+            y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: {
+                    display: true,
+                    text: 'Glucose (mg/dL)'
+                }
+            },
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                title: {
+                    display: true,
+                    text: 'BMI'
+                },
+                grid: {
+                    drawOnChartArea: false,
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        }
+    }
+});
+{% endif %}
+
+function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const question = input.value.trim();
+    
+    if (!question) return;
+    
+    const chatMessages = document.getElementById('chat-messages');
+    
+    const userMessage = document.createElement('div');
+    userMessage.className = 'chat-message user-message';
+    userMessage.textContent = question;
+    chatMessages.appendChild(userMessage);
+    
+    input.value = '';
+    chatMessages.scrollTop = chatMessages.height;
+    
+    fetch('/health-assistant', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ question: question })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const botMessage = document.createElement('div');
+        botMessage.className = 'chat-message bot-message';
+        
+        const answerDiv = document.createElement('div');
+        answerDiv.className = 'bot-answer';
+        answerDiv.textContent = data.answer;
+        botMessage.appendChild(answerDiv);
+        
+        if (data.tips && data.tips.length > 0) {
+            const tipsDiv = document.createElement('div');
+            tipsDiv.className = 'bot-tips';
+            tipsDiv.innerHTML = '<strong>Tips:</strong>';
+            
+            const tipsList = document.createElement('ul');
+            data.tips.forEach(tip => {
+                const li = document.createElement('li');
+                li.textContent = tip;
+                tipsList.appendChild(li);
+            });
+            tipsDiv.appendChild(tipsList);
+            botMessage.appendChild(tipsDiv);
+        }
+        
+        chatMessages.appendChild(botMessage);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+document.getElementById('chat-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+</script>
+
+</body>
+</html>
