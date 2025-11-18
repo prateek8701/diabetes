@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard - Diabetes Predictor</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+ <div class="login">
+    <div class="nav-buttons">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('missions') }}">Missions</a>
+        <a href="{{ url_for('challenges') }}">Challenges</a>
+        <a href="{{ url_for('marketplace') }}">Marketplace</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    
+    <h1>🏆 Leaderboard</h1>
+    <p style="color: #ddd; text-align: center; margin-bottom: 30px;">See how you rank against others!</p>
+    
+    <div class="leaderboard-container">
+        <div class="leaderboard-section">
+            <h2>💎 Top by Health Points</h2>
+            <div class="leaderboard-table">
+                {% for user, gamif in top_points %}
+                <div class="leaderboard-row {% if user.id == current_user.id %}current-user{% endif %}">
+                    <span class="rank">{{ loop.index }}</span>
+                    <span class="username">{{ user.username }}</span>
+                    <span class="stat">{{ gamif.health_points }} pts</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="leaderboard-section">
+            <h2>🔥 Top by Streak</h2>
+            <div class="leaderboard-table">
+                {% for user, gamif in top_streaks %}
+                <div class="leaderboard-row {% if user.id == current_user.id %}current-user{% endif %}">
+                    <span class="rank">{{ loop.index }}</span>
+                    <span class="username">{{ user.username }}</span>
+                    <span class="stat">{{ gamif.current_streak }} days</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="leaderboard-section">
+            <h2>📊 Top by Total Checks</h2>
+            <div class="leaderboard-table">
+                {% for user, gamif in top_checks %}
+                <div class="leaderboard-row {% if user.id == current_user.id %}current-user{% endif %}">
+                    <span class="rank">{{ loop.index }}</span>
+                    <span class="username">{{ user.username }}</span>
+                    <span class="stat">{{ gamif.total_checks }} checks</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+ </div>
+</body>
+</html>

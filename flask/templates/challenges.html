@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seasonal Challenges - Diabetes Predictor</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+ <div class="login">
+    <div class="nav-buttons">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('missions') }}">Missions</a>
+        <a href="{{ url_for('marketplace') }}">Marketplace</a>
+        <a href="{{ url_for('leaderboard') }}">Leaderboard</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    
+    <h1>🏆 Seasonal Challenges</h1>
+    <p style="color: #ddd; text-align: center; margin-bottom: 30px;">Epic challenges with exclusive rewards!</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <div class="challenges-container">
+        {% if challenges %}
+            {% for challenge_data in challenges %}
+            <div class="challenge-card {% if challenge_data.progress.completed %}completed{% endif %}">
+                <div class="challenge-season">{{ challenge_data.challenge.season.upper() }}</div>
+                
+                <div class="challenge-header">
+                    <h3>{{ challenge_data.challenge.title }}</h3>
+                    {% if challenge_data.progress.completed %}
+                    <span class="challenge-badge">✓ COMPLETED</span>
+                    {% endif %}
+                </div>
+                
+                <p class="challenge-description">{{ challenge_data.challenge.description }}</p>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar challenge-progress" style="width: {{ challenge_data.percentage }}%"></div>
+                </div>
+                <p class="progress-text">{{ challenge_data.progress.current_progress }} / {{ challenge_data.challenge.target_value }}</p>
+                
+                <div class="challenge-rewards">
+                    <span class="reward">+{{ challenge_data.challenge.xp_reward }} XP</span>
+                    <span class="reward">+{{ challenge_data.challenge.points_reward }} Points</span>
+                    {% if challenge_data.challenge.badge_reward %}
+                    <span class="reward badge-reward">🏅 {{ challenge_data.challenge.badge_reward }}</span>
+                    {% endif %}
+                </div>
+                
+                <p class="challenge-deadline">{{ challenge_data.challenge.start_date.strftime('%b %d') }} - {{ challenge_data.challenge.end_date.strftime('%b %d, %Y') }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: #ddd; text-align: center; margin: 30px 0;">No active challenges. New seasonal challenges coming soon!</p>
+        {% endif %}
+    </div>
+ </div>
+</body>
+</html>

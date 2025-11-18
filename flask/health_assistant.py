@@ -91,14 +91,13 @@ def get_health_advice(question):
         }
     
     # Default response
-    else:
-        return {
-            'answer': "I can help with questions about diet, exercise, blood sugar monitoring, stress management, sleep, and general diabetes care. What would you like to know?",
-            'tips': [
-                "Ask about healthy eating habits",
-                "Learn about exercise recommendations",
-                "Get tips on blood sugar monitoring",
-                "Understand stress management",
-                "Discover sleep improvement strategies"
-            ]
-        }
+    return {
+        'answer': "I can help with questions about diet, exercise, blood sugar monitoring, stress management, sleep, and general diabetes care. What would you like to know?",
+        'tips': [
+            "Ask about healthy eating habits",
+            "Learn about exercise recommendations",
+            "Get tips on blood sugar monitoring",
+            "Understand stress management",
+            "Discover sleep improvement strategies"
+        ]
+    }

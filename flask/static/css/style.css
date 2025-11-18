@@ -613,3 +613,324 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
     border-color: #6eb6de;
     box-shadow: 0 0 5px rgba(110, 182, 222, 0.3);
 }
+
+/* Missions & Challenges */
+.missions-container, .challenges-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.mission-card, .challenge-card {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.1);
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.mission-card:hover, .challenge-card:hover {
+    transform: translateY(-5px);
+    border-color: #6eb6de;
+}
+
+.mission-card.completed, .challenge-card.completed {
+    border-color: #6ed48d;
+    background: rgba(110, 212, 141, 0.1);
+}
+
+.mission-header, .challenge-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.mission-card h3, .challenge-card h3 {
+    color: #6eb6de;
+    margin: 0;
+    font-size: 20px;
+}
+
+.mission-badge, .challenge-badge {
+    background: #6ed48d;
+    color: #092756;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.mission-description, .challenge-description {
+    color: #ddd;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.progress-bar-container {
+    background: rgba(0,0,0,0.3);
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 15px 0 5px;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #6eb6de, #4a77d4);
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+.challenge-progress {
+    background: linear-gradient(90deg, #e74c3c, #c0392b);
+}
+
+.progress-text {
+    color: #aaa;
+    font-size: 14px;
+    text-align: center;
+    margin: 5px 0;
+}
+
+.mission-rewards, .challenge-rewards {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 15px 0;
+}
+
+.reward {
+    background: rgba(110, 182, 222, 0.2);
+    color: #6eb6de;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.badge-reward {
+    background: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+}
+
+.mission-deadline, .challenge-deadline {
+    color: #aaa;
+    font-size: 13px;
+    margin: 10px 0 0;
+}
+
+.challenge-season {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Marketplace */
+.marketplace-header {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.player-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    color: #ddd;
+}
+
+.marketplace-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.marketplace-item {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.1);
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.marketplace-item:hover {
+    transform: translateY(-5px);
+    border-color: #6eb6de;
+}
+
+.marketplace-item.purchased {
+    border-color: #6ed48d;
+    background: rgba(110, 212, 141, 0.1);
+}
+
+.item-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.marketplace-item h3 {
+    color: #6eb6de;
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.item-description {
+    color: #ddd;
+    font-size: 14px;
+    margin: 10px 0;
+    min-height: 40px;
+}
+
+.item-details {
+    margin: 15px 0;
+}
+
+.item-cost, .item-level {
+    color: #aaa;
+    font-size: 13px;
+    margin: 5px 0;
+}
+
+.btn-purchased {
+    background: #6ed48d;
+    color: #092756;
+}
+
+/* Leaderboard */
+.leaderboard-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.leaderboard-section h2 {
+    color: #6eb6de;
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.leaderboard-table {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 50px 1fr auto;
+    padding: 15px;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.2s;
+}
+
+.leaderboard-row:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.leaderboard-row:last-child {
+    border-bottom: none;
+}
+
+.leaderboard-row.current-user {
+    background: rgba(110, 182, 222, 0.2);
+    border-left: 4px solid #6eb6de;
+}
+
+.rank {
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.username {
+    color: #ddd;
+    font-size: 16px;
+}
+
+.stat {
+    color: #6eb6de;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* XP Level Display */
+.xp-level-display {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid #ffd700;
+}
+
+.level-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.level-badge {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #092756;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.xp-text {
+    color: #ddd;
+    font-size: 14px;
+}
+
+/* Preference Section */
+.preference-section {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.preference-section h3 {
+    color: #6eb6de;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .missions-container,  .challenges-container, .marketplace-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .leaderboard-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .player-stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .login {
+        padding: 10px;
+        margin: 20px auto;
+    }
+}

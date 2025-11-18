@@ -10,6 +10,8 @@ flask-login
 flask-sqlalchemy
 flask-migrate
 psycopg2-binary
+reportlab
+openai
 Flask==2.3.0
 flask-login
 flask-migrate
@@ -18,3 +20,5 @@ numpy==1.24.0
 pandas==2.0.0
 psycopg2-binary
 scikit-learn==1.2.0
+openai
+reportlab

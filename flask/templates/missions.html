@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Missions - Diabetes Predictor</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+ <div class="login">
+    <div class="nav-buttons">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('challenges') }}">Challenges</a>
+        <a href="{{ url_for('marketplace') }}">Marketplace</a>
+        <a href="{{ url_for('leaderboard') }}">Leaderboard</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    
+    <h1>🎯 Weekly Missions</h1>
+    <p style="color: #ddd; text-align: center; margin-bottom: 30px;">Complete missions to earn XP and health points!</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <div class="missions-container">
+        {% if missions %}
+            {% for mission_data in missions %}
+            <div class="mission-card {% if mission_data.progress.completed %}completed{% endif %}">
+                <div class="mission-header">
+                    <h3>{{ mission_data.mission.title }}</h3>
+                    {% if mission_data.progress.completed %}
+                    <span class="mission-badge">✓ COMPLETED</span>
+                    {% endif %}
+                </div>
+                
+                <p class="mission-description">{{ mission_data.mission.description }}</p>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: {{ mission_data.percentage }}%"></div>
+                </div>
+                <p class="progress-text">{{ mission_data.progress.current_progress }} / {{ mission_data.mission.target_value }}</p>
+                
+                <div class="mission-rewards">
+                    <span class="reward">+{{ mission_data.mission.xp_reward }} XP</span>
+                    <span class="reward">+{{ mission_data.mission.points_reward }} Points</span>
+                </div>
+                
+                <p class="mission-deadline">Ends: {{ mission_data.mission.week_end.strftime('%B %d, %Y') }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: #ddd; text-align: center; margin: 30px 0;">No active missions this week. Check back soon!</p>
+        {% endif %}
+    </div>
+ </div>
+</body>
+</html>

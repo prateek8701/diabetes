@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace - Diabetes Predictor</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+ <div class="login">
+    <div class="nav-buttons">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('missions') }}">Missions</a>
+        <a href="{{ url_for('challenges') }}">Challenges</a>
+        <a href="{{ url_for('leaderboard') }}">Leaderboard</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    
+    <h1>🛒 Marketplace</h1>
+    
+    <div class="marketplace-header">
+        <div class="player-stats">
+            <p><strong>Level:</strong> {{ gamification.level }}</p>
+            <p><strong>Points:</strong> {{ gamification.health_points }}</p>
+        </div>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <h2 style="color: #6eb6de; margin-top: 30px;">Available Themes</h2>
+    
+    <div class="marketplace-grid">
+        {% for item in items %}
+        <div class="marketplace-item {% if item.id in purchased_ids %}purchased{% endif %}">
+            <div class="item-icon">{{ item.icon }}</div>
+            <h3>{{ item.name }}</h3>
+            <p class="item-description">{{ item.description }}</p>
+            
+            <div class="item-details">
+                <p class="item-cost">💰 {{ item.cost }} points</p>
+                <p class="item-level">Level {{ item.required_level }} required</p>
+            </div>
+            
+            {% if item.id in purchased_ids %}
+                <button class="btn btn-purchased" disabled>✓ Owned</button>
+            {% elif gamification.level < item.required_level %}
+                <button class="btn" disabled>🔒 Locked</button>
+            {% elif gamification.health_points < item.cost %}
+                <button class="btn" disabled>Not Enough Points</button>
+            {% else %}
+                <form action="{{ url_for('purchase', item_id=item.id) }}" method="post" style="margin: 0;">
+                    <button type="submit" class="btn btn-primary">Purchase</button>
+                </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+ </div>
+</body>
+</html>

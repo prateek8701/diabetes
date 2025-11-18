@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preferences - Diabetes Predictor</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+ <div class="login">
+    <div class="nav-buttons">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+    
+    <h1>⚙️ Preferences</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <form action="{{ url_for('preferences') }}" method="post">
+        <div class="preference-section">
+            <h3>Display Settings</h3>
+            <div class="checkbox-container">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="dark_mode" {% if preferences.dark_mode %}checked{% endif %} />
+                    <span>Enable Dark Mode</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="preference-section">
+            <h3>Notifications</h3>
+            <div class="checkbox-container">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="email_notifications" {% if preferences.email_notifications %}checked{% endif %} />
+                    <span>Email Notifications</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="preference-section">
+            <h3>Privacy</h3>
+            <div class="checkbox-container">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="share_profile_public" {% if preferences.share_profile_public %}checked{% endif %} />
+                    <span>Share Profile Publicly</span>
+                </label>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block">Save Preferences</button>
+    </form>
+ </div>
+</body>
+</html>
