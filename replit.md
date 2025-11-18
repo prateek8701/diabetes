@@ -55,6 +55,9 @@ A comprehensive machine learning web application that predicts diabetes risk, ge
 - scikit-learn 1.2.0
 - pandas 2.0.0
 - numpy 1.24.0
+- Hugging Face Transformers (TinyLlama 1.1B for local AI chatbot)
+- PyTorch (for local AI inference)
+- ReportLab (for PDF generation)
 
 ## Setup
 The application runs on port 5000 and uses a pre-trained Support Vector Classifier (SVC) model with MinMax scaling.

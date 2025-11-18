@@ -8,7 +8,7 @@ import pickle
 from datetime import datetime, date
 from diet_planner import generate_diet_plan
 from health_checkup import generate_health_checkup_plan
-from health_assistant_ai import get_health_advice_ai as get_health_advice
+from health_assistant_local_ai import get_health_advice_local_ai as get_health_advice
 from models import db, User, HealthRecord, UserGamification, UserPreferences, Friendship
 from missions_manager import (
     create_weekly_missions, get_user_mission_progress, 
