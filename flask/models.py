@@ -74,6 +74,10 @@ class UserGamification(db.Model):
         return [b for b in self.badges.split(',') if b] if self.badges else []
     
     def add_xp(self, amount):
+        if self.xp is None:
+            self.xp = 0
+        if self.level is None:
+            self.level = 1
         self.xp += amount
         while self.xp >= self.xp_for_next_level():
             self.xp -= self.xp_for_next_level()
