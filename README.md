@@ -25,4 +25,4 @@ In this project, our objective is to predict whether the patient has diabetes or
 - Execute the command:
    `python app.py`
 
-- Open http://127.0.0.1:5000/ in your browser.
+ 
