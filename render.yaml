@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: diabetes-predictor
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd flask && gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: FLASK_SECRET_KEY
+        generateValue: true

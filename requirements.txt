@@ -7,5 +7,4 @@ flask-sqlalchemy
 flask-migrate
 psycopg2-binary
 reportlab
-accelerate
-sentencepiece
+gunicorn

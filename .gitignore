@@ -21,13 +21,19 @@ wheels/
 *.egg
 MANIFEST
 .env
+.env.*
 venv/
+flask/venv/
 ENV/
 env/
 
 # Flask
 instance/
 .webassets-cache
+*.db
+health_app.db
+health_tracker.db
+
 
 # IDE
 .vscode/
